@@ -1,0 +1,179 @@
+\documentclass[a4paper, 11pt, twoside]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[left=3cm,right=2cm,top=1cm,bottom=1cm,includeheadfoot]{geometry}
+
+
+\usepackage{scrlayer-scrpage}
+\usepackage{nopageno}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[labelfont=footnotesize, font=bf, textfont=footnotesize]{caption}
+\usepackage{hyperref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{multirow, booktabs}
+\usepackage{dblfloatfix}
+\usepackage{amsmath}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{url}
+\usepackage[sorting=none]{biblatex}
+\usepackage{afterpage}
+\usepackage{lipsum}
+\usepackage{arydshln}
+\usepackage[export]{adjustbox}
+
+% \addtokomafont{disposition}{\rmfamily}
+
+\usepackage[nohyperlinks, printonlyused, nolist]{acronym}
+
+\usepackage{stackengine}
+
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+
+\raggedbottom
+
+\newcommand{\tbd}[0]{\textcolor{red}{TBD }}
+\newcommand{\var}[0]{$\pm$}
+
+\addbibresource{references.bib}
+
+\newcommand{\frontmatter}{
+	\cleardoublepage
+	\pagenumbering{Roman}
+	\setcounter{page}{1}
+}
+
+\newcommand{\mainmatter}{
+	\cleardoublepage
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+}
+
+\newcommand{\schlussmatter}{
+	\cleardoublepage
+	\pagenumbering{Roman}
+	\setcounter{page}{6}
+}
+
+\pagestyle{scrheadings}
+\clearscrheadings
+\ofoot{\pagemark}
+
+%%% END Article customizations
+
+\title{Bachelor / Master Thesis:\\My super fancy topic}
+\author{Max Mustermann}
+
+% \setcapindent{0em}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.4\linewidth, height=4cm,keepaspectratio=true]{./figures/uk-logo.pdf}\par\vspace{1cm}
+	{\LARGE Universität Kassel\par}
+	\vspace{0.5cm}
+	{\Large Distributed Systems Group\par}
+	%\scshape
+	\vspace{4cm}
+	{\scshape\Large Bachelor Thesis\par}
+	\vspace{1.5cm}
+	{\huge\bfseries My super fancy topic\par}
+	\vspace{2cm}
+	{\Large\itshape Max Mustermann\par}
+	\vspace{0.5cm}
+	{\large Mat.-Nr.: xxxxxx\\max.mustermann@uni-kassel.de\par}
+	\vfill
+	supervised by\par
+	Prof.~Dr.~rer.~nat.~Oliver \textsc{Hohlfeld}\par
+	M.\ Sc.~Someone \textsc{Else}
+
+	\vfill
+
+% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+\newpage
+\afterpage{
+\thispagestyle{empty}
+\mbox{}
+}
+
+\frontmatter
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/abstract}
+
+\newpage
+\cleardoublepage
+\tableofcontents
+
+\newpage
+\cleardoublepage
+\setcounter{secnumdepth}{0}
+\section{List of Abbreviations}
+
+
+\begin{acronym}[DT]
+	\acro{ai}[AI]{Artificial Intelligence}
+\end{acronym}
+
+
+\setcounter{secnumdepth}{4}
+
+\mainmatter
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/intro}
+
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/background}
+
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/relatedwork}
+
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/approach}
+
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/results}
+
+\newpage
+\cleardoublepage
+\input{sections/future_work}
+
+
+\newpage
+\cleardoublepage
+\input{sections/conclusion}
+
+\schlussmatter
+\newpage
+\addcontentsline{toc}{section}{References}
+\printbibliography
+
+\newpage
+\cleardoublepage
+\section*{Statutory Declaration}
+\thispagestyle{empty}
+The author declares that he has written the thesis at hand independently, without outside help and without the use of any other but the listed sources. Thoughts taken directly or indirectly from external sources (including electronic sources) are marked accordingly without exception. Sources used verbatim and contentual were quoted according to the recognised rules for scientific working. This thesis has not been submitted in the same or similar form, not even partially, within the scope of a different examination.\\\\
+Thus far it also has not been publicised yet.\\\\
+I herewith agree that the thesis will be examined for plagiarism with the help of a plagiarism-detection service.\\\\\\
+\noindent\rule{5cm}{.4pt}\hfill\rule{5cm}{.4pt}\par
+\noindent Place, Date \hfill Signature of the author
+
+\end{document}
