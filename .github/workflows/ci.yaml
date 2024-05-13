@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - alpha
+      - beta
+      - master
+      - renovate/**
+
+jobs:
+  prepare_jobs:
+    name: "Prepare: job optimization"
+    runs-on: ubuntu-latest
+    outputs:
+      pr_found: ${{ steps.pr.outputs.pr_found }}
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Get current PR
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@3.0.0
+        with:
+          filterOutClosed: true
+          github-token: ${{ github.token }}
+          sha: ${{ github.event.pull_request.head.sha }}
+  build:
+    needs: prepare_jobs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v4
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: thesis.tex
+      - name: Upload PDF file
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF
+          path: thesis.pdf
+  release_semantic:
+    needs: build
+    name: Release (semantic)
+    uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@2.0.0-beta.13
+    permissions:
+      contents: write
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
