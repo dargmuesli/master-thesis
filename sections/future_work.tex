@@ -1,8 +1,90 @@
 \section{Future Work}
-\label{section:future_work}
-%
-% was sind spannende anknüpfungspunkte?
-% was würde man mit mehr zeit noch alles umsetzen?
-% -> denke groß & klein: es gibt sicher detailverbesserungen, aber auch ganz neue ansätze oder fragestellungen, die sich ergeben
-%
-\lipsum
+\label{sec:future_work}
+
+This thesis aims to serve as a foundation for plentiful future research endeavors.
+The pipeline definition designed in this thesis was created with extensibility and modularity in mind.
+Therefore, various extensions, optimizations, and even replacements of pipeline components can be made.
+The following sections provide inspirations for such future work.
+
+\subsection{Extensions}
+\label{sec:future-work-extensions}
+
+Due to the full flexibility in data sources to ingest and in transformation functions to code, there is significant freedom in developing additional modules.
+Code-level analysis could be performed on links included in a page's \ac{html}, on \ac{css} complexity, on code formatting, or on variable naming conventions.
+The existence or frequency of comments in code, the use of code minification, or \ac{nlp} analysis could also help identify culture-specific developer habits.
+Additionally, page-level metrics, such as sitemaps of a website, could be inspected.
+Network information, such as \ac{ip} addresses of servers distributing website content, could also be incorporated.
+As illustrated by the networking example, entirely new data dimensions can be incorporated beyond the topics discussed in this thesis.
+
+Beyond extensions to the pipeline's workflow, quality assurance could also be improved.
+For example, additional data tests could be defined in dbt, and unit tests for Python functions could be added.
+
+Further work could also focus on handling data updates, for instance, by implementing versioning strategies tailored to specific use cases.
+Additionally, Iceberg's data snapshot, branching, and tagging functionalities could be made more accessible through utility functions.
+The same applies to data maintenance tasks such as snapshot expiry, deletion of orphan files, and file compaction.
+
+In recent years, many data engineering efforts have aimed to pave the way for \ac{ml} applications.
+\textbf{Mangaonkar and Penikalapati}, for example, demonstrated how data pipelines' monitoring and reliability could be enhanced through \acp{llm}~\cite{Mangaonkar2024}.
+Spark has a built-in \ac{ml} library named \textit{MLlib} that should already cover many common use cases.
+
+
+\subsection{Optimizations}
+\label{sec:future-work-optimizations}
+
+As the ingestion of large amounts of data took by far the most time, as shown in \cref{tab:analysis-dataset-asset-times}, further research could focus on improving ingestion speeds for Iceberg.
+A general comparison of distributed ingestion and computation speeds between Spark and other solutions, such as the \ac{olap} \acp{dbms} mentioned in \cref{sec:design-databases}, could be insightful, especially when considering parallel writes to the same table in a distributed architecture.
+Significant reductions in ingestion durations could likely be achieved by using \href{https://py.iceberg.apache.org/}{\textit{PyIceberg}}, which avoids the detour through Spark, thereby saving on network transfers and marshalling overhead.
+
+The combination of Spark and Iceberg should support parallel writes to different partitions of a single table, suggesting that strategies for optimal partitioning and write task distribution among workers could be developed.
+A potentially helpful partitioning scheme could draw inspiration from the Internet Archive's \href{http://crawler.archive.org/articles/user_manual/glossary.html#surt}{\ac{surt}} scheme, which reverses the domain parts of a \ac{uri} to more closely resemble the \ac{dns} hierarchy when read from left to right.
+In simple terms, this scheme allows for more intuitive sorting of \acp{uri} as the \ac{tld} appears first, followed by the second-level domain and subdomains.
+Partitioning inspired by \ac{surt} allows for more nested partitions; a simpler variant could involve partitioning by \ac{tld} only.
+
+Reliability optimizations for downloads from Common Crawl's data server have already been initiated through the exponential backoff decorator in \cref{lst:dagster-source-common-crawl-fetch}, but \ac{aws}'s \texttt{503} ``slow down'' \ac{http} response codes still occur frequently enough to cause long-running ingestion tasks to fail.
+With the asynchronous nature of source file iteration, it is challenging to determine which of the 90,000 source files in each monthly Common Crawl dataset have already been ingested when an ingestion run is aborted.
+Either a refined retry mechanism could increase resiliency in the face of network issues, or, ideally, the ingestion algorithm could be extended to include metadata tracking to log the dataset parts that have already been processed.
+
+Another tool that could benefit from increased reliability is the \texttt{rest} pod currently operating in the pipeline.
+At present, the \texttt{rest} pod is stateful and loses its catalog data\footnote{The \ac{rest} catalog mainly stores information on which tables exist and in which namespace they reside.} when stopped, for instance, if Kubernetes reschedules the \texttt{rest} pod to a different node.
+It turns out that the \texttt{rest} pod is designed to store its catalog data in-memory, but due to a bug, it persists the catalog data as a file~\cite{Kolter2023}.
+This flaw can be exploited to our advantage by mounting a volume as the file's parent directory, allowing this storage to persist across restarts.
+The catalog's SQLite file is stored as \texttt{/tmp/iceberg\_rest\_mode=memory} (sic!) by default, but this location can be configured through the \texttt{CATALOG\_URI} environment variable.
+
+There is ongoing work on an official Iceberg \ac{rest} catalog Dockerfile, which addresses the incorrect file creation issue~\cite{Bhat2024}.
+When switching to the official Iceberg \ac{rest} container image in the future, the \texttt{CATALOG\_URI} will need to be set to ensure data persistency.
+
+The Dockerfile provided in \cref{lst:appendix-listings-dockerfile} currently includes the code location for Dagster, Dagster's web server, and Dagster's daemon.
+In an optimal deployment, these three components would be deployed separately.
+
+Furthermore, the pipeline's dashboard is currently accessible to anyone on the internet as access authentication has not yet been implemented for this service.
+The MinIO \ac{gui} is credential-protected as defined in \cref{lst:minio-compose}, and the Spark driver as well as the Chart web server are read-only, so they could theoretically remain as they are.
+
+Currently, a single Dagster asset generates all charts as outlined in \cref{sec:implementation-pipeline-visualization}.
+An improvement could involve having each table-filling asset generate its own graphs and link them in the asset's build metadata.
+
+Finally, node affinity in Kubernetes could be improved.
+The current deployment starts a specific number of Spark workers, one fewer than the number of nodes available in the Kubernetes cluster, as noted in \cref{sec:implementation-deployment}.
+The idea behind this setup is to leave one node for the Spark master and to use the full capacity of all other nodes.
+However, no mechanism is yet defined to ensure each node is utilized effectively and that one node is exclusively reserved for the Spark master.
+Such a concept could be established if the pipelines designed in this thesis are used at scale.
+
+
+\subsection{Replacements}
+\label{sec:future-work-replacements}
+
+The pipeline system's design is modular in the sense that individual parts can be substituted by other solutions within the same category.
+For example, if requirements arise that make support for streaming necessary -- along with all conditions such an orientation would entail (discussed in \cref{sec:related-work-big-data}) -- Spark could be replaced by Flink.
+Also refer to the \href{https://www.databricks.com/glossary/lambda-architecture}{\textit{Lambda Architecture}}, which outlines how to run batch and streaming processing in parallel, or to the \textit{Kappa Architecture}, a one-stream-fits-all iteration on the Lambda Architecture~\cite{Marz2011, Kreps2014}.
+
+If self-hosted storage needs to be migrated to a cloud provider, the de-facto standard S3 allows this transition to happen comfortably.
+For Iceberg, there are alternatives like Hudi and Delta Lake.
+These alternatives can already be used in unison through XTable or Delta Lake UniForm.
+
+Instead of the block storage abstraction provided by Longhorn, \ac{hdfs} could be evaluated to determine if it offers increased performance due to higher data locality.
+This evaluation is especially useful if the pipeline is deployed on a cluster of machines with high network latency, i.e., geographically distant nodes.
+
+The tool dbt can be removed completely if its assistance in structuring transformations is considered too complex, particularly if the pipeline is executed as individual instances rather than a centrally hosted pipeline shared by multiple users.
+The \ac{sql} statement templating in dbt can be replaced by simple \ac{sql} strings in Python.
+
+If Python is not considered the optimal programming language for the task, the \href{https://beam.apache.org/}{\textit{Apache Beam}} model allows pipelines to be defined in other languages such as Java, Go, TypeScript, and Scala.
+Finally, if the modularity offered by the pipeline design in this thesis incurs too much maintenance effort, it is always possible to revert to an \ac{olap} \ac{dbms} like ClickHouse.

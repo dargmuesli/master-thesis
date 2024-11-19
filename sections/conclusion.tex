@@ -1,18 +1,38 @@
 \section{Conclusion}
-\label{section:conclusion}
-%
-% interessanter Einstieg
-%
-% Zusammenfassung der Arbeit
-%
-% Wichtigste Ergebnisse & Research Questions Beantwortung
-% RQ 1
-%
-% RQ 1 Antwort
-%
-% RQ 2
-%
-% RQ 2 Antwort
-%
-% Forschungsstand und Ausblick
-\lipsum
+\label{sec:conclusion}
+
+\epigraph{
+    ``Undoubtedly, many of us believe there's a little bit of “magic” to the way that we go about things, and we get to our destination by following uncertain and circuitous routes of inquiry and exploration.''
+}{
+    Heintz and Lee~\cite{Heintz2019}
+}
+
+The goal of this thesis has been to design a pipeline capable of handling Big Data for the purpose of analyzing website data.
+The pipeline is intended to support future research building on the foundation established by this thesis.
+To ensure maximum flexibility in upcoming scientific endeavors, the system was designed to be modular.
+
+Initially, a microservice-based approach was intuitively selected to allow maximum implementation freedom for each module.
+Each microservice was considered to be written in the programming language best suited for its task, with each service using an individual storage solution most efficient for its data.
+As a prerequisite, the execution environment was set to be a Kubernetes cluster, with Longhorn providing block storage abstraction.
+
+We argue that data scientists benefit from a broad range of data sources and data engineers from a clear storage architecture.
+Therefore, we propose a modern combination of Iceberg as an open storage format and Spark as a distributed computation and query engine.
+Python, one of the most popular programming languages, offers the flexibility to run virtually any computation and connect to any data source.
+Finally, Dagster completes the pipeline system as a workflow orchestrator for data asset materializations.
+
+In our pipeline, the Iceberg table format is written to S3-compatible object storage.
+These objects can be stored by various well-known cloud providers or in a self-hosted solution such as MinIO.
+We transform data into fact and dimension tables, structured within a Medallion architecture.
+This approach integrates data lake and warehouse capabilities into a unified Lakehouse concept.
+
+This pipeline design avoids the bootstrapping overhead that each custom module definition would introduce, as well as the added complexity of maintaining a custom \ac{api} definition for cross-module connectivity.
+Furthermore, distributed processing is native to our design and does not need to be reimplemented for multiple containerized modules.
+
+Our pipeline implementation also utilizes dbt as a valuable tool for organizing \ac{sql} queries.
+However, we encountered issues with dbt's Spark module, for which a solution depends on the release of Spark \texttt{4}.
+It is possible to omit dbt from our pipeline and define the queries it manages directly in Python.
+We see dbt as particularly powerful in large projects with complex workflows.
+
+Our research on cultural influence on code concluded that the behavior of individuals differs between cultures, such as in coding styles, though boundaries blur in our globalized world.
+While code authorship can be identified through code analysis, attributing website code to a specific country is challenging.
+We find that further research should distinguish between code origin and code target, as cultural influence is twofold: code is shaped by the developers' cultures and by the culture of users which a software artefact, like a website, aims to target.

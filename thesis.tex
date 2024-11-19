@@ -2,7 +2,7 @@
 
 \usepackage[utf8]{inputenc}
 
-\usepackage[left=3cm,right=2cm,top=1cm,bottom=1cm,includeheadfoot]{geometry}
+\usepackage[left=3cm,right=2cm,top=1cm,bottom=1cm,includeheadfoot,head=13.6pt]{geometry}
 
 
 \usepackage{scrlayer-scrpage}
@@ -23,10 +23,41 @@
 \usepackage{lipsum}
 \usepackage{arydshln}
 \usepackage[export]{adjustbox}
+\usepackage{epigraph}
+% \usepackage{newpx}
+% \usepackage{mlmodern}
+\usepackage[nameinlink, noabbrev]{cleveref}
+% \usepackage[title]{appendix}
+\usepackage{minted}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+\usepackage{subcaption}
+
+% disable hyperlink output
+\let\orighref\href
+\renewcommand{\href}[2]{#2}
+
+\setminted{breaklines, frame=single, linenos}
+
+% disable minted's red boxes around unexpected syntax, e.g. useful for templating syntax
+\AtBeginEnvironment{minted}{
+  \renewcommand{\fcolorbox}[4][]{#4}}
+
+\crefname{rqcounter}{RQ}{RQs}
+\crefname{rqcounter}{RQ}{RQs}
+\Crefname{subrqcounter}{RQ}{RQs}
+\Crefname{subrqcounter}{RQ}{RQs}
 
 % \addtokomafont{disposition}{\rmfamily}
 
-\usepackage[nohyperlinks, printonlyused, nolist]{acronym}
+% \usepackage[nohyperlinks, printonlyused]{acronym}
+\usepackage{acro}
+
+
+\input{acronyms}
+
+\hyphenation{Ja-pa-nese}
+\hyphenation{Py-Spark}
 
 \usepackage{stackengine}
 
@@ -35,66 +66,82 @@
 
 \raggedbottom
 
-\newcommand{\tbd}[0]{\textcolor{red}{TBD }}
-\newcommand{\var}[0]{$\pm$}
+\newcommand{\TODO}[1]{\textbf{\textcolor{red}{TODO: #1}}}
+% \newcommand{\tbd}[0]{\textcolor{red}{TBD }}
+% \newcommand{\var}[0]{$\pm$}
 
 \addbibresource{references.bib}
 
 \newcommand{\frontmatter}{
-	\cleardoublepage
-	\pagenumbering{Roman}
-	\setcounter{page}{1}
+    \cleardoublepage
+    \pagenumbering{Roman}
+    \setcounter{page}{1}
 }
 
 \newcommand{\mainmatter}{
-	\cleardoublepage
-	\pagenumbering{arabic}
-	\setcounter{page}{1}
+    \cleardoublepage
+    \pagenumbering{arabic}
+    \setcounter{page}{1}
 }
 
 \newcommand{\schlussmatter}{
-	\cleardoublepage
-	\pagenumbering{Roman}
-	\setcounter{page}{6}
+    \cleardoublepage
+    \pagenumbering{Roman}
+    \setcounter{page}{6}
 }
 
 \pagestyle{scrheadings}
-\clearscrheadings
+\clearmainofpairofpagestyles
 \ofoot{\pagemark}
 
 %%% END Article customizations
 
-\title{Bachelor / Master Thesis:\\My super fancy topic}
-\author{Max Mustermann}
+\title{Master Thesis:\\Analysis of technical anomalies on websites through the development of a modular Big Data pipeline}
+\author{Jonas Thelemann}
 
 % \setcapindent{0em}
 
 \begin{document}
 
-\begin{titlepage}
-	\centering
-	\includegraphics[width=0.4\linewidth, height=4cm,keepaspectratio=true]{./figures/uk-logo.pdf}\par\vspace{1cm}
-	{\LARGE Universität Kassel\par}
-	\vspace{0.5cm}
-	{\Large Distributed Systems Group\par}
-	%\scshape
-	\vspace{4cm}
-	{\scshape\Large Bachelor Thesis\par}
-	\vspace{1.5cm}
-	{\huge\bfseries My super fancy topic\par}
-	\vspace{2cm}
-	{\Large\itshape Max Mustermann\par}
-	\vspace{0.5cm}
-	{\large Mat.-Nr.: xxxxxx\\max.mustermann@uni-kassel.de\par}
-	\vfill
-	supervised by\par
-	Prof.~Dr.~rer.~nat.~Oliver \textsc{Hohlfeld}\par
-	M.\ Sc.~Someone \textsc{Else}
+\newcounter{rqcounter}
+\newcounter{subrqcounter}
+\renewcommand\thesubrqcounter{\arabic{rqcounter}.\arabic{subrqcounter}}
+\makeatletter
+\newcommand{\iflabelexists}[3]{\@ifundefined{myr@#1}{#2}{#3}}
+\makeatother
+\newcommand\Question[2]{
+\def\labelorref{\iflabelexists{#1}{\refstepcounter{rqcounter}\setcounter{subrqcounter}{0}\arabic{rqcounter}\label{#1}\expandafter\xdef\csname myr@#1\endcsname{}}{\ref{#1}}}
+  \noindent\textbf{RQ\labelorref: #2}
+}
+\newcommand\subQuestion[2]{
+\def\labelorref{\iflabelexists{#1}{\refstepcounter{subrqcounter}\arabic{rqcounter}.\arabic{subrqcounter}\label{#1}\expandafter\xdef\csname myr@#1\endcsname{}}{\ref{#1}}}
+  \noindent\textbf{RQ\labelorref: #2}
+}
 
-	\vfill
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.4\linewidth, height=4cm,keepaspectratio=true]{./figures/uk-logo.pdf}\par\vspace{1cm}
+    {\LARGE Universität Kassel\par}
+    \vspace{0.5cm}
+    {\Large Distributed Systems Group\par}
+    %\scshape
+    \vspace{4cm}
+    {\scshape\Large Master Thesis\par}
+    \vspace{1.5cm}
+    {\huge\bfseries Analysis of Global Variations in Website Code Based on a Modular Big Data Pipeline Design\par}
+    \vspace{2cm}
+    {\Large\itshape Jonas Thelemann\par}
+    \vspace{0.5cm}
+    {\large Mat.-Nr.: 35200846\\jonas-thelemann@student.uni-kassel.de}
+    \vfill
+    supervised by\par
+    Prof.~Dr.~rer.~nat.~Oliver \textsc{Hohlfeld}\par
+    Dr.~Jens \textsc{Kosiol}
+
+    \vfill
 
 % Bottom of the page
-	{\large \today\par}
+    {\large \today\par}
 \end{titlepage}
 
 \newpage
@@ -116,13 +163,19 @@
 \newpage
 \cleardoublepage
 \setcounter{secnumdepth}{0}
-\section{List of Abbreviations}
+\printacronyms[heading=section, name={List of Acronyms}]
 
+\clearpage
+\addcontentsline{toc}{section}{List of Figures}
+\listoffigures
 
-\begin{acronym}[DT]
-	\acro{ai}[AI]{Artificial Intelligence}
-\end{acronym}
+\clearpage
+\addcontentsline{toc}{section}{List of Listings}
+\listoflistings
 
+\clearpage
+\addcontentsline{toc}{section}{List of Tables}
+\listoftables
 
 \setcounter{secnumdepth}{4}
 
@@ -135,29 +188,35 @@
 \newpage
 \acresetall
 \cleardoublepage
-\input{sections/background}
-
-\newpage
-\acresetall
-\cleardoublepage
 \input{sections/relatedwork}
 
 \newpage
 \acresetall
 \cleardoublepage
-\input{sections/approach}
+\input{sections/design}
 
 \newpage
 \acresetall
 \cleardoublepage
-\input{sections/results}
+\input{sections/implementation}
 
 \newpage
+\acresetall
+\cleardoublepage
+\input{sections/analysis}
+
+\newpage
+\acresetall
+\cleardoublepage
+\input{sections/evaluation}
+
+\newpage
+\acresetall
 \cleardoublepage
 \input{sections/future_work}
 
-
 \newpage
+\acresetall
 \cleardoublepage
 \input{sections/conclusion}
 
@@ -165,6 +224,14 @@
 \newpage
 \addcontentsline{toc}{section}{References}
 \printbibliography
+
+\newpage
+\acresetall
+\cleardoublepage
+\renewcommand{\thefigure}{A\arabic{figure}}
+\renewcommand{\thelisting}{A\arabic{listing}}
+\renewcommand{\thetable}{A\arabic{table}}
+\input{sections/appendix}
 
 \newpage
 \cleardoublepage
