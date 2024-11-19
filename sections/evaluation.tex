@@ -1,0 +1,159 @@
+\section{Evaluation}
+\label{sec:evaluation}
+
+Now that we have run our Big Data pipeline to obtain the results shown in the preceding chapter, we will evaluate the answers to our research questions defined in \cref{sec:intro-research-question}.
+We will also revisit the objectives of this thesis and discuss whether they have been met by our pipeline design.
+
+\subsection{Research Questions}
+\label{sec:evaluation-rq}
+
+The answers to our research questions were partly derived from the literature review conducted in \cref{sec:related-work} and from the insights gained by implementing our design proposal.
+
+\begin{enumerate}
+    \item[] \textbf{\Cref{rq:0} Can we test or refute hypotheses on global variations in website code?}
+
+    The pipeline designed in this work is capable of processing any data that allows hypotheses to be tested or refuted.
+    The capabilities of this pipeline are not limited to variation detection, the domain of websites, or even code in general.
+    Our goal to create a modular pipeline for a specific use case, paired with research on modern Big Data pipelines, led us to design a system from the perspective of a data engineer, rather than a web developer.
+    We view this as a significantly beneficial architectural decision, as this thesis was primarily intended to lay a foundation for future researchers and thus should not be unnecessarily constrained.
+
+    \item[] \textbf{\Cref{rq:1} What influence does culture have on code?}
+
+    Our literature review identified scientific evidence for cultural influences on behavior, notably Hofstede's cultural dimension theory.
+    Sources such as Shah and Harrold provided specific observations on cultural differences in development practices across the globe.
+    For instance, Japanese culture is said to have a high \ac{lto} and a tendency to reject expatriate leaders with short-term success orientation~\cite{CFG2024, Marshall}.
+    Shah and Harrold observed that a Japanese development team ensured high code quality through meticulous testing, while a U.S. development team placed less emphasis on testing functionality outside core features.
+
+    \item[] \textbf{\Cref{rq:2} Which global variations in code have been researched before?}
+
+    A review of related work revealed no general analysis of code variations at a global scale.
+    However, code variations have been studied on a smaller scale for specific use cases, such as code authorship attribution.
+    For example, Caliskan-Islam et al. (2015) demonstrated that even with over 1,000 developers, individual code styles could remain distinctive enough to allow accurate author identification~\cite{CaliskanIslam2015}.
+    Code variation detection is also commonly used in plagiarism detection.
+
+    \begin{enumerate}
+        \item[] \textbf{\Cref{rq:21} Which specific feature patterns in website code can be identified and analyzed for global variations?}
+
+        In this thesis, we demonstrated the detection of web technologies through \ac{regex} pattern matching on over seven million \ac{html} documents.
+        As mentioned in the evaluation for \Cref{rq:0} above, our pipeline is not limited to specific types of analysis; any hypothesis on feature patterns for which a fitting dataset is available can be analyzed.
+
+        A set of feature patterns for web design analysis is provided by Alexander et al. (2016)~\cite{Alexander2016}.
+        They analyze layout (page structure), navigation (menu structure), links, multimedia (interaction possibilities), visual representation (use of images), color, and text of 460 websites.
+
+        Various literature addresses specific feature patterns on smaller scales.
+        We found little information on broader patterns at larger scales and thus consider further research on this topic to be worthwhile.
+
+        \medskip
+        \item[] \textbf{\Cref{rq:22} Which statistical methods and algorithms are effective in detecting global variations in website code?}
+
+        As we found no technical limitations to the types of data our pipeline can process and limited quantitative research at a global scale, the effectiveness of statistical methods and algorithms for variation detection in code depends on the use case.
+        For example, Alexander et al. used the Chi-square method for feature comparisons.
+        Anomaly detection is often performed using clustering algorithms such as \textit{k-means} and \textit{DBSCAN}~\cite{Chen2014, Mussabayev2023}.
+    \end{enumerate}
+
+    \item[] \textbf{\Cref{rq:3} Which data sources can be used to yield valuable insights?}
+
+    Our pipeline design allows for any data to be ingested as long as an ingestion method can be defined in Python.
+    In the context of website data, we note that large crawling datasets are publicly available, allowing general analysis without the complexities of setting up a custom crawler.
+
+    \begin{enumerate}
+        \item[] \textbf{\Cref{rq:31} Which datasets include the feature patterns under study and are publicly available?}
+
+        The two primary datasets that, by being large and containing website data, fit the goal of this thesis are the Common Crawl and HTTP Archive datasets.
+        The Common Crawl dataset is stored by \ac{aws}, and the HTTP Archive dataset by \ac{gcp}.
+        The Common Crawl dataset is accessible via \ac{http} without authentication, though rate limiting may apply.
+        The HTTP Archive dataset is tailored toward performance metrics, while the Common Crawl dataset is not.
+        The file format used by Common Crawl is the \ac{warc} file format, while the HTTP Archive uses the \ac{har} file format.
+        The Common Crawl dataset is considerably larger than the HTTP Archive dataset, with around 250 billion and 15 million websites included, respectively.
+
+        \medskip
+        \item[] \textbf{\Cref{rq:32} In which ways can useful datasets be sourced independently?}
+
+        Depending on the required level of abstraction, e.g., to satisfy security measures such as those provided by services like Cloudflare, different tools are available for web data crawling.
+        Apache Nutch is a robust solution for distributed crawling, as demonstrated by Common Crawl's use of it.
+        If proper browser emulation is needed, a tool like Selenium should be chosen instead.
+        It is essential to avoid excessive load on source servers to prevent timeouts or blacklisting.
+    \end{enumerate}
+
+    \item[] \textbf{\Cref{rq:4} What is the current state of Big Data and data engineering?}
+
+    The exponential increase in data storage is a phenomenon of the 21st century, and the term ``Big Data'' emerged alongside it.
+    While the concept of data warehousing can apply to smaller-scale data, data lakes were designed to store data from various sources at large scale.
+    As data volumes continue to grow with no end in sight, data engineers have become increasingly important.
+
+    \begin{enumerate}
+        \item[] \textbf{\Cref{rq:41} What constitutes a modern Big Data pipeline design?}
+
+        A recent development, the Lakehouse concept, aims to unify data lakes and data warehouses.
+        This unification was driven by a decrease in storage costs, especially for S3-compatible object storage.
+
+        We argue that a modern Big Data pipeline should not leave any compute resources unused and should focus on full resource utilization rather than premature optimizations, especially when run in a distributed system.
+        The context of application should also be considered carefully to allow deliberate decisions for or against stream-based tooling in real-time applications.
+
+        \medskip
+        \item[] \textbf{\Cref{rq:42} How can the effectiveness and accuracy of the pipeline be benchmarked?}
+
+        Ensuring the quality of ingested data is crucial, as processing poor-quality data can impair result accuracy.
+        For the Common Crawl dataset, the publisher provides dataset statistics, which can be compared against those from a fetched subset to identify potential issues.
+        This was especially useful in our analysis of global web technology usage, as even our small subset of the most recent Common Crawl dataset exhibited characteristics similar to those reported for the entire dataset.
+        We therefore believe that our analysis is based on a representative subset of Common Crawl's full dataset.
+
+        Timing measurements allowed us to adjust the pipeline's performance and identify issues with the tools used.
+        Standardized benchmarks like \textit{TPC-H} and \textit{TPC-DS} could be run to accurately compare our pipeline's design to similar systems~\cite{Bajaber2020, Ivanov2020}.
+        However, we did not conduct such benchmarks, as this type of performance evaluation is outside the scope of this thesis.
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Objectives}
+\label{sec:evaluation-objectives}
+
+The technical objectives defined in \cref{sec:intro-objectives} guided our pipeline design and implementation.
+We revisit these objectives now to evaluate whether they have been reached as intended.
+
+\begin{enumerate}
+    \item \textbf{Design and implement a scalable data pipeline}
+
+    In \cref{sec:design}, we proposed a combination of several tools and technologies that together form a modular Big Data pipeline.
+    The pipeline is scalable, as both the number of compute workers and the size of storage volumes can be adjusted variably.
+    The implementation outlined in \cref{sec:implementation} produced a system that was capable of generating the results showcased in \cref{sec:analysis}, fulfilling all architectural requirements.
+
+    One pipeline component, dbt, was found to suffer from minor performance issues.
+    The inclusion of dbt in the proposed pipeline stack is optional, though, and can be substituted by raw \ac{sql} strings defined in Python.
+
+    In addition to flexibility, the pipeline's modularity implies some maintenance complexity.
+    All running containers must include compatible versions of tooling such as Spark, Iceberg, as well as Python and Java.
+    Updates to the container images are currently not provided by a third party, so these must be managed by a future pipeline maintainer for now.
+
+    We configured the Spark workers to install a necessary dependency for our workloads at boot time.
+    This customization should be avoided for a clean separation of concerns.
+    Instead, custom functions to run on Spark workers should be encoded as \acp{udf}.
+
+    \item \textbf{Identify and quantify global variations in website code}
+
+    In \cref{sec:analysis-dataset}, we analyzed source data and combined data by examining web technology usage across nations.
+    We thus succeeded in identifying and quantifying global variations in website code, although more diverse analyses would be desirable.
+    Such further analyses are intentionally left for future researchers, as the scope of this thesis is the design, implementation, and exemplary use of a Big Data pipeline.
+
+    \item \textbf{Evaluate the qualitative performance of the data pipeline}
+
+    The statistics published by Common Crawl, with certain metrics mentioned in \cref{sec:related-work-big-data-datasets}, allow us to assess the data quality of our ingestion process.
+    The full Common Crawl dataset, from which we ingested a subset, contains 43.22\% of \acp{cctld} and 4.6\% of \texttt{.ru} \acp{cctld}, whereas our subset contains 41.9\% of \acp{cctld} and 4.4\% of \texttt{.ru} \acp{cctld}.
+    In the full dataset, the predominant charset is \texttt{UTF-8} with a share of 93.3\%, and in our subset, \texttt{UTF-8} is also the most frequent charset, with 87.6\%.
+    This leads us to believe that the quality of the ingested data subset is fairly representative.
+
+    \item \textbf{Formalize a data ingestion module definition}
+
+    Following our choice of Iceberg as a unified yet open storage format, Spark as the compute engine, and Python as a widely supported and tool-compatible programming language, we revisit an idea introduced as part of the intuitive approach in \cref{sec:design-prerequisites-intuitive-approach}.
+    The concept was to construct the pipeline from distinct services, each potentially using a different programming language and storage solution.
+    The hypothesis was that high pipeline performance could be achieved by selecting the most efficient execution engine and storage system for each type of computation.
+    For example, regex matching could theoretically be faster in a specific programming language, which may differ from the language best suited for numerical operations.
+    Similarly, binary output from one transformation step might be stored most efficiently in one storage solution, while scalar values could be more efficiently stored elsewhere.
+
+    This approach to service architecture could theoretically enable the most optimized implementation of a data pipeline.
+    However, it is important to note that data written by one service would need to be read by another, and there is no guarantee that the output format of one service is ideally suited as input for another.
+    Moreover, service requirements may change over time, potentially negating any performance gains previously achieved.
+
+    Evaluating the most efficient solution for each specific case would be disproportionately time-consuming.
+    Additionally, the implicit optimization required for unique combinations of pipeline services is unlikely to justify the added complexity.
+    For these reasons, we will not define an interoperability interface for a highly detailed service architecture and will instead leverage the foundational tool combination outlined previously.
+\end{enumerate}

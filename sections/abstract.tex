@@ -1,13 +1,20 @@
 \setcounter{secnumdepth}{0}
 \section{Abstract}
 
-\lipsum
-% Worum Geht es? (Thema, Problem, Zielsetzung)
+Driven by the hypothesis that technical differences in website data across the globe may partly root in cultural differences, we design, implement, and run a Big Data pipeline, subsequently evaluating the results.
+We assess the quality of the sourced data and the distribution of web technology usage across nations.
 
-% Wie Thema bearbeitet? (Vorgehensweise, Methodik, Auswertung)
+The pipeline design proposes an ambitious yet modern combination of the well-established Spark framework for computation and the open Iceberg table format for storage.
+This pivot away from traditional \ac{dbms} is a deliberate decision towards maximizing modularity and flexibility in application, while ensuring optimal computational performance on a distributed Kubernetes cluster.
 
-% Wichtigste Ergebnisse? (Bezug zur Zielsetzung)
+Data is sourced from \textit{Common Crawl}, a large public repository of global web data.
+The data is ingested, validated, and transformed across multiple layers of our pipeline, providing clean and extensible data lineage, with plots and graphs visualizing the results.
+The implementation also aims to ensure a satisfactory \ac{dx} for future researchers who may extend and utilize our Big Data pipeline.
 
-% Wie kann Ergebnis interpretiert werden? (Bedeutung, Einordnung)
+While an extensive literature review yields valuable insights into the relationship between code and culture, attributing website data culturally remains challenging due to a lack of authorship clarity.
+Our analysis demonstrates the pipeline's capability to support deep dataset exploration, providing exemplary findings on web technology usage and pipeline performance.
+
+Finally, the pipeline's modularity allows for various modifications, ranging from optimizations and extensions to complete replacements of individual components.
+In this way, this thesis establishes a resilient foundation that invites future researchers to reliably build upon it, while also pinpointing opportunities for further development.
 
 \setcounter{secnumdepth}{4}
